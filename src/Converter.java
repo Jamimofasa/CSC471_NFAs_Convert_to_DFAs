@@ -3,7 +3,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * @author James Morand
+ * @author James Morand & Chris Manriquez
  */
 public class Converter {
 
@@ -11,6 +11,7 @@ public class Converter {
     static Set<Integer> mainSet = new HashSet <>(); //put all data into a set which will automatically have no duplicates
     static List<ArrayList<Integer>> mylist = new ArrayList <>(dataTable);
     static Set<ArrayList <Integer>> g = new HashSet<>();
+    static ArrayList<State> statesList = new ArrayList<>();
 
     public static void main(String[] args) {
 
@@ -24,6 +25,21 @@ public class Converter {
 
         //make a dfa method
         convertToDFA(mainSet);
+
+        System.out.println();
+
+
+        //Creates ArrayList for States
+        for(int i = 0; i < dataTable.size(); i++)
+        {
+            State tempState = new State(dataTable.get(i).get(0));
+            tempState.setTransitions(dataTable.get(i));
+            statesList.add(tempState);
+
+        }
+
+        //Method call for Epsilon closures
+        epsClosures();
 
 //        g.addAll(dataTable); //add the arraylist into a set
 //
@@ -98,6 +114,55 @@ public static void readFile ()
                     System.out.print("Empty");
             }
             System.out.print("}");
+        }
+    }
+
+    public static void epsClosures()
+    {
+        String epsClose = "";
+        String temp2 = "";
+        for(State s : statesList)
+        {
+            epsClose += "E(" + s.getStateID() + ") = { ";
+
+
+            if(s.getTransitions().isEmpty())
+            {
+                epsClose += s.getStateID() + " ";
+            }
+            else
+            {
+                epsClose += s.getStateID() + " ";
+
+                for(int i = 0; i < s.getTransitions().size(); i++)
+                {
+                    epsClose += s.getTransitions().get(i) + " ";
+                }
+
+                for(int i = 0; i < s.getTransitions().size(); i++)
+                {
+                    int temp = s.getTransitions().get(i) - 1;
+                    for(int j = 0; j < statesList.get(temp).getTransitions().size(); j++)
+                    {
+                        temp2 += statesList.get(temp).getTransitions().get(j) + " ";
+                    }
+                }
+
+                if(epsClose.contains(temp2))
+                {
+                    epsClose += "";
+                }
+                else
+                {
+                    epsClose += temp2;
+                }
+
+            }
+
+            epsClose += "}";
+
+            System.out.println(epsClose);
+            epsClose = "";
         }
     }
 }
